@@ -2,6 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 
+import HeaderLayout from "./components/HeaderLayout";
 import {
   Home,
   Profile,
@@ -15,27 +16,33 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
-  },
-  {
-    path: "sign-in",
-    element: <Signin />,
-  },
-  {
-    path: "sign-up",
-    element: <Signup />,
-  },
-  {
-    path: "offers",
-    element: <Offers />,
-  },
-  {
-    path: "forgot-password",
-    element: <ForgotPassword />,
-  },
-  {
-    path: "profile",
-    element: <Profile />,
+    element: <HeaderLayout />,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: "sign-in",
+        element: <Signin />,
+      },
+      {
+        path: "sign-up",
+        element: <Signup />,
+      },
+      {
+        path: "offers",
+        element: <Offers />,
+      },
+      {
+        path: "forgot-password",
+        element: <ForgotPassword />,
+      },
+      {
+        path: "profile",
+        element: <Profile />,
+      },
+    ],
   },
 ]);
 const rootNode = document.getElementById("root");
