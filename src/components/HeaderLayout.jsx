@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
-import { Outlet } from "react-router";
+import { useNavigate, Outlet } from "react-router";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import Logo from "../assets/logo.svg";
@@ -11,7 +10,14 @@ const HeaderLayout = () => {
 
   return (
     <>
-      <header>
+      <header
+        style={{
+          backgroundColor: "white",
+          boxShadow: "0 0 10px -7px black",
+          position: "sticky",
+          zIndex: 100,
+        }}
+      >
         <Container>
           <div
             onClick={() => navigate("/")}
@@ -66,9 +72,7 @@ const HeaderLayout = () => {
         </Container>
       </header>
       <main>
-        <Container>
-          <Outlet />
-        </Container>
+        <Outlet />
       </main>
     </>
   );
@@ -87,7 +91,7 @@ const Container = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 8rem;
+    width: 5rem;
     cursor: pointer;
   }
   .nav-links {
@@ -99,6 +103,6 @@ const Container = styled.div`
     color: gray;
   }
   a {
-    padding-block: 0.5rem;
+    padding-block: 1.5rem;
   }
 `;
