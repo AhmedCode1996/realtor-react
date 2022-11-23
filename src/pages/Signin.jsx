@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import sign from "../assets/sign.svg";
+import sign from "../assets/sign3.svg";
 import email from "../assets/email.svg";
 import password from "../assets/password.svg";
 import eye from "../assets/eye.svg";
@@ -21,7 +21,7 @@ const Signin = () => {
     });
   };
   return (
-    <section style={{ paddingBlock: "2rem" }}>
+    <section style={{ paddingTop: "2rem" }}>
       <h2
         style={{
           textAlign: "center",
@@ -113,6 +113,10 @@ const Container = styled.div`
   padding-inline: 1rem;
   & > div {
     flex-basis: 50%;
+    padding: 1rem;
+  }
+  .sign-in-image {
+    transform: translateY(-5rem) scale(1.2);
   }
   .flow-content > * + * {
     margin-top: 3rem;
@@ -132,7 +136,7 @@ const Container = styled.div`
     outline: none;
     &:focus {
       box-shadow: 0 0 12px -5px gray;
-      border: 2px solid #57b279;
+      border: 2px solid #a3d8ff;
     }
   }
   img.input-icon {
@@ -156,10 +160,10 @@ const Container = styled.div`
     justify-content: space-between;
     font-size: 1.8rem;
     & p:first-child a {
-      color: #57b279;
+      color: #2196f3;
     }
     & p:last-child a {
-      color: #000066;
+      color: #3235b7;
     }
   }
   .form-submit {
@@ -194,7 +198,7 @@ const Container = styled.div`
     justify-content: center;
     algin-align: center;
     column-gap: 1rem;
-    background-color: #57b279;
+    background-color: #2196f3;
     width: 100%;
     border-radius: 1rem;
     padding: 1rem 2rem;
