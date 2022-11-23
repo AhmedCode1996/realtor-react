@@ -1,3 +1,8 @@
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
 import styled from "styled-components";
 import sign from "../assets/sign3.svg";
 import email from "../assets/email.svg";
@@ -7,9 +12,12 @@ import user from "../assets/user.svg";
 import showPassword from "../assets/showPassword.svg";
 import google from "../assets/google.svg";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { db } from "../firebase";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 const Signup = () => {
   const [passwordHidden, setPasswordHidden] = useState(true);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -21,6 +29,31 @@ const Signup = () => {
     setFormData((prevState) => {
       return { ...prevState, [name]: value };
     });
+  };
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    try {
+      const auth = getAuth();
+      const userCrediential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+      updateProfile(auth.currentUser, {
+        displayName: formData.username,
+      });
+      const { user } = userCrediential;
+      const sequredFormData = { ...formData };
+      delete sequredFormData.password;
+      sequredFormData.timeStamp = serverTimestamp();
+      setDoc(doc(db, "users", user.uid), sequredFormData);
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <section>
@@ -39,7 +72,7 @@ const Signup = () => {
           <img src={sign} alt="form logo" />
         </div>
         <div className="sign-in-form">
-          <form className="flow-content">
+          <form className="flow-content" onSubmit={submitHandler}>
             <p>
               <img className="input-icon" src={user} alt="user logo" />
               <input
@@ -129,7 +162,7 @@ const Container = styled.div`
     padding: 1rem;
   }
   .sign-in-image {
-    flex-basis: 60%;
+    flex-basis: 55%;
     transform: translateY(-5rem) scale(1.2);
   }
   .flow-content > * + * {
