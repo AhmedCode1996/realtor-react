@@ -2,26 +2,28 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   updateProfile,
-} from "firebase/auth";
-import styled from "styled-components";
-import sign from "../assets/sign3.svg";
-import email from "../assets/email.svg";
-import password from "../assets/password.svg";
-import eye from "../assets/eye.svg";
-import user from "../assets/user.svg";
-import showPassword from "../assets/showPassword.svg";
-import google from "../assets/google.svg";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { db } from "../firebase";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+  GoogleAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth';
+import styled from 'styled-components';
+import sign from '../assets/sign3.svg';
+import email from '../assets/email.svg';
+import password from '../assets/password.svg';
+import eye from '../assets/eye.svg';
+import user from '../assets/user.svg';
+import showPassword from '../assets/showPassword.svg';
+import google from '../assets/google.svg';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { db } from '../firebase';
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 const Signup = () => {
   const [passwordHidden, setPasswordHidden] = useState(true);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
+    username: '',
+    email: '',
+    password: '',
   });
 
   const formHandler = (e) => {
@@ -29,6 +31,29 @@ const Signup = () => {
     setFormData((prevState) => {
       return { ...prevState, [name]: value };
     });
+  };
+
+  const googleClickHandler = async () => {
+    try {
+      const auth = getAuth();
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const { user } = result;
+
+      const docRef = doc(db, 'users', user.uid);
+      const docSnap = await getDoc(docRef);
+
+      !docSnap.exists() &&
+        (await setDoc(docRef, {
+          name: user.displayName,
+          email: user.email,
+          timeStamp: serverTimestamp(),
+        }));
+
+      navigate('/');
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const submitHandler = async (e) => {
@@ -47,9 +72,9 @@ const Signup = () => {
       const sequredFormData = { ...formData };
       delete sequredFormData.password;
       sequredFormData.timeStamp = serverTimestamp();
-      setDoc(doc(db, "users", user.uid), sequredFormData);
+      setDoc(doc(db, 'users', user.uid), sequredFormData);
       setTimeout(() => {
-        navigate("/");
+        navigate('/');
       }, 1000);
     } catch (error) {
       console.log(error);
@@ -59,10 +84,10 @@ const Signup = () => {
     <section>
       <h2
         style={{
-          textAlign: "center",
-          fontSize: "3rem",
-          fontWeight: "bold",
-          marginBlock: "2rem",
+          textAlign: 'center',
+          fontSize: '3rem',
+          fontWeight: 'bold',
+          marginBlock: '2rem',
         }}
       >
         Sign Up
@@ -98,7 +123,7 @@ const Signup = () => {
             <p>
               <img className="input-icon" src={password} alt="email logo" />
               <input
-                type={passwordHidden ? "password" : "text"}
+                type={passwordHidden ? 'password' : 'text'}
                 name="password"
                 id="password"
                 placeholder="Password"
@@ -123,11 +148,11 @@ const Signup = () => {
             </p>
             <div className="form-info">
               <p>
-                have an account? <Link to="/sign-in">Sign In</Link>{" "}
+                have an account? <Link to="/sign-in">Sign In</Link>{' '}
               </p>
               <p>
-                {" "}
-                <Link to="/forgot-password">Forgot Password?</Link>{" "}
+                {' '}
+                <Link to="/forgot-password">Forgot Password?</Link>{' '}
               </p>
             </div>
             <button className="form-submit" type="submit">
@@ -136,7 +161,11 @@ const Signup = () => {
             <div className="form-line">
               <span>OR</span>
             </div>
-            <button className="google-button">
+            <button
+              onClick={googleClickHandler}
+              type="button"
+              className="google-button"
+            >
               <img src={google} alt="google button" />
               Continue with Google
             </button>
