@@ -1,12 +1,14 @@
-import styled from "styled-components";
-import sign from "../assets/sign3.svg";
-import email from "../assets/email.svg";
-import google from "../assets/google.svg";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import styled from 'styled-components';
+import sign from '../assets/sign3.svg';
+import email from '../assets/email.svg';
+import google from '../assets/google.svg';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
 const ForgotPassword = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: "",
+    email: '',
   });
 
   const formHandler = (e) => {
@@ -15,14 +17,27 @@ const ForgotPassword = () => {
       return { ...prevState, [name]: value };
     });
   };
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    try {
+      const auth = getAuth();
+      await sendPasswordResetEmail(auth, formData.email);
+      setTimeout(() => {
+        navigate('/sign-in');
+      }, 1000);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
   return (
-    <section style={{ paddingTop: "2rem" }}>
+    <section style={{ paddingTop: '2rem' }}>
       <h2
         style={{
-          textAlign: "center",
-          fontSize: "3rem",
-          fontWeight: "bold",
-          marginBottom: "5rem",
+          textAlign: 'center',
+          fontSize: '3rem',
+          fontWeight: 'bold',
+          marginBottom: '5rem',
         }}
       >
         Forgot Password
@@ -32,7 +47,7 @@ const ForgotPassword = () => {
           <img src={sign} alt="form logo" />
         </div>
         <div className="sign-in-form">
-          <form className="flow-content">
+          <form onSubmit={submitHandler} className="flow-content">
             <p>
               <img className="input-icon" src={email} alt="email logo" />
               <input
@@ -47,11 +62,11 @@ const ForgotPassword = () => {
 
             <div className="form-info">
               <p>
-                Don't have an account? <Link to="/sign-up">Register</Link>{" "}
+                Don't have an account? <Link to="/sign-up">Register</Link>{' '}
               </p>
               <p>
-                {" "}
-                <Link to="/sign-in">Sign in instead</Link>{" "}
+                {' '}
+                <Link to="/sign-in">Sign in instead</Link>{' '}
               </p>
             </div>
             <button className="form-submit" type="submit">

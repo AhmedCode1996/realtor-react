@@ -1,17 +1,19 @@
-import styled from "styled-components";
-import sign from "../assets/sign3.svg";
-import email from "../assets/email.svg";
-import password from "../assets/password.svg";
-import eye from "../assets/eye.svg";
-import showPassword from "../assets/showPassword.svg";
-import google from "../assets/google.svg";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import styled from 'styled-components';
+import sign from '../assets/sign3.svg';
+import email from '../assets/email.svg';
+import password from '../assets/password.svg';
+import eye from '../assets/eye.svg';
+import showPassword from '../assets/showPassword.svg';
+import google from '../assets/google.svg';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 const Signin = () => {
+  const navigate = useNavigate();
   const [passwordHidden, setPasswordHidden] = useState(true);
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: '',
+    password: '',
   });
 
   const formHandler = (e) => {
@@ -20,14 +22,29 @@ const Signin = () => {
       return { ...prevState, [name]: value };
     });
   };
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    try {
+      const auth = getAuth();
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+      userCredential.user && navigate('/');
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
   return (
-    <section style={{ paddingTop: "2rem" }}>
+    <section style={{ paddingTop: '2rem' }}>
       <h2
         style={{
-          textAlign: "center",
-          fontSize: "3rem",
-          fontWeight: "bold",
-          marginBottom: "5rem",
+          textAlign: 'center',
+          fontSize: '3rem',
+          fontWeight: 'bold',
+          marginBottom: '5rem',
         }}
       >
         Sign in
@@ -37,7 +54,7 @@ const Signin = () => {
           <img src={sign} alt="form logo" />
         </div>
         <div className="sign-in-form">
-          <form className="flow-content">
+          <form onSubmit={submitHandler} className="flow-content">
             <p>
               <img className="input-icon" src={email} alt="email logo" />
               <input
@@ -52,7 +69,7 @@ const Signin = () => {
             <p>
               <img className="input-icon" src={password} alt="email logo" />
               <input
-                type={passwordHidden ? "password" : "text"}
+                type={passwordHidden ? 'password' : 'text'}
                 name="password"
                 id="password"
                 placeholder="Password"
@@ -77,11 +94,11 @@ const Signin = () => {
             </p>
             <div className="form-info">
               <p>
-                Don't have an account? <Link to="/sign-up">Register</Link>{" "}
+                Don't have an account? <Link to="/sign-up">Register</Link>{' '}
               </p>
               <p>
-                {" "}
-                <Link to="/forgot-password">Forgot Password?</Link>{" "}
+                {' '}
+                <Link to="/forgot-password">Forgot Password?</Link>{' '}
               </p>
             </div>
             <button className="form-submit" type="submit">
