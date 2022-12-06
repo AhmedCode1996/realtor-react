@@ -8,9 +8,9 @@ import {
 import styled from 'styled-components';
 import sign from '../assets/sign3.svg';
 import email from '../assets/email.svg';
+import user from '../assets/user.svg';
 import password from '../assets/password.svg';
 import eye from '../assets/eye.svg';
-import user from '../assets/user.svg';
 import showPassword from '../assets/showPassword.svg';
 import google from '../assets/google.svg';
 import { useState } from 'react';
@@ -107,6 +107,7 @@ const Signup = () => {
                 placeholder="Full name"
                 value={formData.username}
                 onChange={formHandler}
+                disabled
               />
             </p>
             <p>
@@ -118,6 +119,7 @@ const Signup = () => {
                 placeholder="Email Address"
                 value={formData.email}
                 onChange={formHandler}
+                disabled
               />
             </p>
             <p>
