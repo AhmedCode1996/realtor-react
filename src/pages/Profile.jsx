@@ -1,11 +1,14 @@
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, updateProfile } from 'firebase/auth';
+import { doc, updateDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import email from '../assets/email.svg';
 import user from '../assets/user.svg';
+import { db } from '../firebase';
 
 const Profile = () => {
+  const [edit, isEdit] = useState(false);
   const auth = getAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -31,7 +34,25 @@ const Profile = () => {
     auth.signOut();
     navigate('/');
   };
-  const editHandler = () => {};
+  const editHandler = (e) => {
+    isEdit(!edit);
+    edit && submitEdit();
+  };
+
+  const submitEdit = async () => {
+    try {
+      if (auth.currentUser.displayName !== formData.name) {
+        await updateProfile(auth.currentUser, {
+          displayName: formData.username,
+        });
+
+        const docRef = doc(db, 'users', auth.currentUser.uid);
+        await updateDoc(docRef, {
+          name: formData.username,
+        });
+      }
+    } catch (error) {}
+  };
 
   return (
     <section className="profile">
@@ -41,12 +62,16 @@ const Profile = () => {
           <p>
             <img className="input-icon" src={user} alt="user logo" />
             <input
+              style={{
+                backgroundColor: `${edit ? '#f7c9d4' : 'white'}`,
+              }}
               type="username"
               name="username"
               id="username"
               placeholder="Full name"
               value={formData.username}
               onChange={formHandler}
+              disabled={!edit}
             />
           </p>
           <p>
@@ -58,12 +83,16 @@ const Profile = () => {
               placeholder="Email Address"
               value={formData.email}
               onChange={formHandler}
+              disabled={true}
+              style={{ backgroundColor: 'white' }}
             />
           </p>
           <div className="profile-options">
             <p className="edit">
               Do want to change your name?{' '}
-              <span onClick={editHandler}>Edit</span>{' '}
+              <span onClick={editHandler}>
+                {edit ? 'Save changes' : 'Edit'}
+              </span>{' '}
             </p>
             <p className="logout" onClick={logoutHandler}>
               Sign Out
@@ -75,7 +104,7 @@ const Profile = () => {
   );
 };
 const Container = styled.div`
-  max-width: 1000px;
+  max-width: 600px;
   margin-inline: auto;
   padding-inline: 1rem;
   padding-block: 2rem;
@@ -113,6 +142,7 @@ const Container = styled.div`
     transform: translate(1%, 1%);
     border-right: 1.5px solid gray;
     padding: 0.5rem;
+    fill: white;
   }
   .profile-options {
     display: flex;
