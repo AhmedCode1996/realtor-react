@@ -1,26 +1,33 @@
-import { useState } from "react";
-import { useNavigate, Outlet } from "react-router";
-import { NavLink } from "react-router-dom";
-import styled from "styled-components";
-import Logo from "../assets/logo.svg";
-import LogoAnimation from "../assets/logo.gif";
+import { useEffect, useState } from 'react';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { useNavigate, Outlet } from 'react-router';
+import { NavLink } from 'react-router-dom';
+import styled from 'styled-components';
+import Logo from '../assets/logo.svg';
+import LogoAnimation from '../assets/logo.gif';
 const HeaderLayout = () => {
+  const [profileStatus, setProfileStatus] = useState(null);
   const [animatedLogo, setAnimatedLogo] = useState(true);
   const navigate = useNavigate();
-
+  const auth = getAuth();
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      user ? setProfileStatus(true) : setProfileStatus(false);
+    });
+  }, [auth]);
   return (
     <>
       <header
         style={{
-          backgroundColor: "white",
-          boxShadow: "0 0 10px -7px black",
-          position: "sticky",
+          backgroundColor: 'white',
+          boxShadow: '0 0 10px -7px black',
+          position: 'sticky',
           zIndex: 100,
         }}
       >
         <Container>
           <div
-            onClick={() => navigate("/")}
+            onClick={() => navigate('/')}
             className="logo"
             onMouseLeave={() => setAnimatedLogo(true)}
             onMouseOver={() => setAnimatedLogo(false)}
@@ -31,10 +38,10 @@ const HeaderLayout = () => {
             <NavLink
               style={({ isActive }) =>
                 isActive
-                  ? { borderBottom: "2px solid #EB7798", color: "black" }
+                  ? { borderBottom: '2px solid #EB7798', color: 'black' }
                   : {
-                      borderBottom: "2px solid transparent",
-                      transition: "all 0.3s",
+                      borderBottom: '2px solid transparent',
+                      transition: 'all 0.3s',
                     }
               }
               to="/"
@@ -45,10 +52,10 @@ const HeaderLayout = () => {
             <NavLink
               style={({ isActive }) =>
                 isActive
-                  ? { borderBottom: "2px solid #EB7798", color: "black" }
+                  ? { borderBottom: '2px solid #EB7798', color: 'black' }
                   : {
-                      borderBottom: "2px solid transparent",
-                      transition: "all 0.3s",
+                      borderBottom: '2px solid transparent',
+                      transition: 'all 0.3s',
                     }
               }
               to="offers"
@@ -58,15 +65,15 @@ const HeaderLayout = () => {
             <NavLink
               style={({ isActive }) =>
                 isActive
-                  ? { borderBottom: "2px solid #EB7798", color: "black" }
+                  ? { borderBottom: '2px solid #EB7798', color: 'black' }
                   : {
-                      borderBottom: "2px solid transparent",
-                      transition: "all 0.3s",
+                      borderBottom: '2px solid transparent',
+                      transition: 'all 0.3s',
                     }
               }
-              to="sign-in"
+              to={profileStatus ? '/profile' : '/Sign-in'}
             >
-              Sign in
+              {profileStatus ? 'Profile' : 'Sign in'}
             </NavLink>
           </nav>
         </Container>

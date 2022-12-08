@@ -5,10 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import email from '../assets/email.svg';
 import user from '../assets/user.svg';
+import Spinner from '../components/Spinner';
 import { db } from '../firebase';
 
 const Profile = () => {
   const [edit, isEdit] = useState(false);
+  const [logged, setLogged] = useState(false);
   const auth = getAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -19,8 +21,10 @@ const Profile = () => {
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (!user) {
+        setLogged(true);
         navigate('/');
       } else {
+        setLogged(false);
         setFormData({ username: user.displayName, email: user.email });
       }
     });
@@ -56,6 +60,7 @@ const Profile = () => {
 
   return (
     <section className="profile">
+      {logged && <Spinner />}
       <Container>
         <h2 className="title">Profile</h2>
         <form className="flow-content">
