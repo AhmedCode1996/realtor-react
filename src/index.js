@@ -1,8 +1,8 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
-import "./index.css";
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import './index.css';
 
-import HeaderLayout from "./components/HeaderLayout";
+import HeaderLayout from './components/HeaderLayout';
 import {
   Home,
   Profile,
@@ -10,12 +10,13 @@ import {
   Signup,
   Offers,
   ForgotPassword,
-} from "./pages/index";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+  CreateListing,
+} from './pages/index';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <HeaderLayout />,
     children: [
       {
@@ -23,28 +24,32 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "sign-in",
+        path: 'sign-in',
         element: <Signin />,
       },
       {
-        path: "sign-up",
+        path: 'sign-up',
         element: <Signup />,
       },
       {
-        path: "offers",
+        path: 'offers',
         element: <Offers />,
       },
       {
-        path: "forgot-password",
+        path: 'forgot-password',
         element: <ForgotPassword />,
       },
       {
-        path: "profile",
+        path: 'profile',
         element: <Profile />,
+      },
+      {
+        path: 'create-listing',
+        element: <CreateListing />,
       },
     ],
   },
 ]);
-const rootNode = document.getElementById("root");
+const rootNode = document.getElementById('root');
 const root = createRoot(rootNode);
 root.render(<RouterProvider router={router} />);

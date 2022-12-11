@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* General Styles  */
 * {
   box-sizing: border-box;
   padding: 0;
@@ -9,11 +10,28 @@
 }
 
 body {
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   background-color: rgb(240, 253, 244);
 }
 html {
   font-size: 62.5%;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  padding: 0;
+  margin: 0;
+}
+
+button {
+  outline: none;
+  border: none;
+}
+
+a {
+  text-decoration: none;
 }
 
 img {
@@ -25,3 +43,16 @@ img {
 ul {
   list-style: none;
 }
+
+input,
+textarea {
+  outline: none;
+  border: none;
+}
+/* General Styles  */
+
+/* Utility Classes  */
+.flow-content > * + * {
+  margin-top: 3rem;
+}
+/* Utility Classes  */
