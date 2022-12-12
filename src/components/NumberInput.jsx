@@ -1,22 +1,21 @@
 import styled from 'styled-components';
-const TextareaForm = ({ title, value, onChange }) => {
+
+const NumberInput = ({ title, value, onChange, name }) => {
   return (
     <Item>
       <span>{title}</span>
-      <textarea
-        name={title}
-        id=""
+      <input
+        type="number"
         value={value}
         onChange={onChange}
-        rows="3"
-        placeholder={title}
+        name={name}
         required
-      ></textarea>
+      />
     </Item>
   );
 };
 
-export default TextareaForm;
+export default NumberInput;
 
 const Item = styled.article`
   span {
@@ -26,10 +25,11 @@ const Item = styled.article`
     text-transform: capitalize;
     margin-bottom: 0.4rem;
   }
-  textarea {
-    width: 100%;
-    padding: 1.2rem;
+  input {
+    width: 40%;
+    padding: 1.5rem;
     font-size: 1.5rem;
+    text-transform: capitalize;
     border-radius: 0.5rem;
     transition: all 0.2s ease-in-out;
     box-shadow: 0 4px 6px -6px black;

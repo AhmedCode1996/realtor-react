@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
-
+import { ListingContext } from './context';
 import HeaderLayout from './components/HeaderLayout';
 import {
   Home,
@@ -13,6 +13,9 @@ import {
   CreateListing,
 } from './pages/index';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+
+import { ToastContainer } from 'react-toastify';
+  import 'react-toastify/dist/ReactToastify.css';
 
 const router = createBrowserRouter([
   {
@@ -52,4 +55,9 @@ const router = createBrowserRouter([
 ]);
 const rootNode = document.getElementById('root');
 const root = createRoot(rootNode);
-root.render(<RouterProvider router={router} />);
+root.render(
+  <ListingContext>
+    <RouterProvider router={router} />
+    <ToastContainer />
+  </ListingContext>
+);

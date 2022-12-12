@@ -2,18 +2,30 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import uuid from 'react-uuid';
 
-const RadioForm = ({ title, inputType, formType, leftItem, rightItem }) => {
+const RadioForm = ({ title, formName, leftItem, rightItem, onChange }) => {
   const [leftID] = useState(uuid());
   const [rightID] = useState(uuid());
   return (
     <Item>
       <span>{title}</span>
       <p>
-        <input type={inputType} name={formType} id={`leftItem-${leftID}`} />
+        <input
+          type="radio"
+          name={formName}
+          value={leftItem}
+          id={`leftItem-${leftID}`}
+          onChange={onChange}
+        />
         <label htmlFor={`leftItem-${leftID}`}>{leftItem}</label>
       </p>
       <p>
-        <input type={inputType} name={formType} id={`rightItem-${rightID}`} />
+        <input
+          type="radio"
+          name={formName}
+          value={rightItem}
+          id={`rightItem-${rightID}`}
+          onChange={onChange}
+        />
         <label htmlFor={`rightItem-${rightID}`}>{rightItem}</label>
       </p>
     </Item>
