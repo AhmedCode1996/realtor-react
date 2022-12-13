@@ -1,7 +1,12 @@
-import { toast } from 'react-toastify';
-import success from './../assets/success.gif';
-import styled from 'styled-components';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useGlobalFormData } from '../context';
+import styled from 'styled-components';
+import { getAuth } from 'firebase/auth';
+import { toast } from 'react-toastify';
+import Spinner from '../components/Spinner';
+import success from './../assets/success.gif';
+import error from './../assets/error.gif';
 import {
   NumberInput,
   RadioForm,
@@ -9,6 +14,26 @@ import {
   TextForm,
 } from './../components/index';
 const CreateListing = () => {
+  const [logged, setLogged] = useState(true);
+
+  const navigate = useNavigate();
+
+  const { currentUser } = getAuth();
+
+  useEffect(() => {
+    setLogged(true);
+    toast.error('Please login first', {
+      icon: ({ theme, type }) => <img src={success} alt="sucess submit" />,
+    });
+    setTimeout(() => {
+      if (!currentUser) {
+        navigate('/sign-in');
+      }
+    }, 3000);
+    return () => {
+      setLogged(false);
+    };
+  }, []);
   const { formData, setFormData } = useGlobalFormData();
 
   const changeHandler = (e) => {
@@ -20,12 +45,14 @@ const CreateListing = () => {
   const submitHandler = (e) => {
     e.preventDefault();
     toast.success('Congratulations, you submitted correctly', {
-      icon: ({ theme, type }) => <img src={success} alt="sucess submit" />,
+      icon: ({ theme, type }) => <img src={error} alt="navigating error" />,
     });
     console.log(formData);
   };
+
   return (
-    <section className="listing">
+    <section style={{ position: 'relative' }}>
+      {logged && <Spinner />}
       <Container>
         <h2 className="listing-title">Create a Listing</h2>
         <form onSubmit={submitHandler} className="listing-form flow-content">
