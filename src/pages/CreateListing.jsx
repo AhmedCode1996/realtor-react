@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useGlobalFormData } from '../context';
 import styled from 'styled-components';
-import { getAuth } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { toast } from 'react-toastify';
 import Spinner from '../components/Spinner';
 import success from './../assets/success.gif';
@@ -14,26 +14,28 @@ import {
   TextForm,
 } from './../components/index';
 const CreateListing = () => {
-  const [logged, setLogged] = useState(true);
+  const [logged, setLogged] = useState(false);
+  const auth = getAuth();
 
   const navigate = useNavigate();
 
-  const { currentUser } = getAuth();
-
   useEffect(() => {
-    setLogged(true);
-    toast.error('Please login first', {
-      icon: ({ theme, type }) => <img src={success} alt="sucess submit" />,
-    });
-    setTimeout(() => {
-      if (!currentUser) {
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        setLogged(true);
+        console.log(logged);
+        toast.error('Please login first', {
+          icon: ({ theme, type }) => (
+            <img src={error} alt="nagivatge to sign-in page" />
+          ),
+        });
         navigate('/sign-in');
+      } else {
+        setLogged(false);
+        console.log(logged);
       }
-    }, 3000);
-    return () => {
-      setLogged(false);
-    };
-  }, []);
+    });
+  }, [auth, logged, navigate]);
   const { formData, setFormData } = useGlobalFormData();
 
   const changeHandler = (e) => {
@@ -45,7 +47,7 @@ const CreateListing = () => {
   const submitHandler = (e) => {
     e.preventDefault();
     toast.success('Congratulations, you submitted correctly', {
-      icon: ({ theme, type }) => <img src={error} alt="navigating error" />,
+      icon: ({ theme, type }) => <img src={success} alt="success submit" />,
     });
     console.log(formData);
   };

@@ -6,6 +6,8 @@ import {
   signInWithPopup,
 } from 'firebase/auth';
 import styled from 'styled-components';
+import alert from './../assets/error.gif';
+import success from './../assets/success.gif';
 import sign from '../assets/sign3.svg';
 import email from '../assets/email.svg';
 import user from '../assets/user.svg';
@@ -17,6 +19,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
 import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 const Signup = () => {
   const [passwordHidden, setPasswordHidden] = useState(true);
   const navigate = useNavigate();
@@ -74,10 +77,16 @@ const Signup = () => {
       sequredFormData.timeStamp = serverTimestamp();
       setDoc(doc(db, 'users', user.uid), sequredFormData);
       setTimeout(() => {
+        toast.success('successful registration', {
+          icon: ({ theme, type }) => <img src={success} alt="success" />,
+        });
         navigate('/');
       }, 1000);
     } catch (error) {
-      console.log(error);
+      const { message } = error;
+      toast.error(message, {
+        icon: ({ theme, type }) => <img src={alert} alt="error" />,
+      });
     }
   };
   return (
@@ -107,7 +116,6 @@ const Signup = () => {
                 placeholder="Full name"
                 value={formData.username}
                 onChange={formHandler}
-                disabled
               />
             </p>
             <p>
@@ -119,7 +127,6 @@ const Signup = () => {
                 placeholder="Email Address"
                 value={formData.email}
                 onChange={formHandler}
-                disabled
               />
             </p>
             <p>
