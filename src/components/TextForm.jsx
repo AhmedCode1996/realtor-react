@@ -3,7 +3,7 @@ const TextForm = ({ title, type, value, onChange }) => {
   return (
     <Item>
       <span>{title}</span>
-      <input type={type} name={title} onChange={onChange} value={value} id="" placeholder={title} required />
+      <input type={type} name={title} onChange={onChange} value={value} id="" placeholder={title}  />
     </Item>
   );
 };

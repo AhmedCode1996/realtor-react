@@ -9,7 +9,7 @@ const NumberInput = ({ title, value, onChange, name }) => {
         value={value}
         onChange={onChange}
         name={name}
-        required
+        // required
       />
     </Item>
   );

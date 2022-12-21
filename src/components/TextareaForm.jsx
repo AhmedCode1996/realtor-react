@@ -10,7 +10,7 @@ const TextareaForm = ({ title, value, onChange }) => {
         onChange={onChange}
         rows="3"
         placeholder={title}
-        required
+        // required
       ></textarea>
     </Item>
   );

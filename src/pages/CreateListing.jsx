@@ -1,4 +1,13 @@
 import { useEffect, useState } from 'react';
+import uuid from 'react-uuid';
+import { db } from './../firebase';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from 'firebase/storage';
 import { useNavigate } from 'react-router';
 import { useGlobalFormData } from '../context';
 import styled from 'styled-components';
@@ -7,6 +16,7 @@ import { toast } from 'react-toastify';
 import Spinner from '../components/Spinner';
 import success from './../assets/success.gif';
 import error from './../assets/error.gif';
+import alert from './../assets/alert.gif';
 import {
   NumberInput,
   RadioForm,
@@ -23,7 +33,6 @@ const CreateListing = () => {
     onAuthStateChanged(auth, (user) => {
       if (!user) {
         setLogged(true);
-        console.log(logged);
         toast.error('Please login first', {
           icon: ({ theme, type }) => (
             <img src={error} alt="nagivatge to sign-in page" />
@@ -32,24 +41,119 @@ const CreateListing = () => {
         navigate('/sign-in');
       } else {
         setLogged(false);
-        console.log(logged);
       }
     });
   }, [auth, logged, navigate]);
   const { formData, setFormData } = useGlobalFormData();
+  const {
+    name,
+    bed,
+    bath,
+    address,
+    latitude,
+    longitude,
+    description,
+    regularPrice,
+    images,
+  } = formData;
 
   const changeHandler = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => {
-      return { ...prevData, [name]: value };
-    });
+
+    // check for files input
+    if (e.target.files) {
+      setFormData((prevData) => ({
+        ...prevData,
+        images: e.target.files,
+      }));
+    }
+
+    // check for non files input
+    if (!e.target.files) {
+      setFormData((prevData) => {
+        return { ...prevData, [name]: value };
+      });
+    }
   };
-  const submitHandler = (e) => {
+
+  const submitHandler = async (e) => {
     e.preventDefault();
-    toast.success('Congratulations, you submitted correctly', {
+
+    if (images.length > 6) {
+      toast.error('maiximum 6 images', {
+        icon: ({ theme, type }) => <img src={alert} alt="images error" />,
+      });
+      return;
+    }
+
+    const storeImage = async (image) => {
+      return new Promise((resolve, reject) => {
+        const storage = getStorage();
+        const fileName = `${auth.currentUser.uid}-${image.name}-${uuid()}`;
+        const storageRef = ref(storage, fileName);
+
+        const uploadTask = uploadBytesResumable(storageRef, image);
+
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            // Observe state change events such as progress, pause, and resume
+            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log('Upload is ' + progress + '% done');
+            switch (snapshot.state) {
+              case 'paused':
+                console.log('Upload is paused');
+                break;
+              case 'running':
+                console.log('Upload is running');
+                break;
+              default:
+                console.log('something went wrong');
+            }
+          },
+          (error) => {
+            // Handle unsuccessful uploads
+            reject(error);
+          },
+          () => {
+            // Handle successful uploads on complete
+            // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              resolve(downloadURL);
+            });
+          }
+        );
+      });
+    };
+
+    const imageUrls = await Promise.all(
+      [...images].map((image) => storeImage(image))
+    ).catch((error) => {
+      toast.error('error on uploading images', {
+        icon: ({ theme, type }) => <img src={alert} alt="error" />,
+      });
+      return;
+    });
+
+    const formDataCopy = {
+      ...formData,
+      imageUrls,
+      timeStamp: serverTimestamp(),
+    };
+
+    delete formDataCopy.images;
+
+    const docRef = await addDoc(collection(db, 'listings'), formDataCopy);
+
+    console.log(formDataCopy);
+
+    toast.success('Congratulations, you created listing correctly', {
       icon: ({ theme, type }) => <img src={success} alt="success submit" />,
     });
-    console.log(formData);
+
+    navigate(`/category/${formData.type}/${docRef.id}`);
   };
 
   return (
@@ -68,20 +172,20 @@ const CreateListing = () => {
           <TextForm
             title="name"
             type="text"
-            value={formData.name}
+            value={name}
             onChange={changeHandler}
           />
           <div className="form-item">
             <NumberInput
               title="bed"
-              value={formData.bed}
+              value={bed}
               onChange={changeHandler}
               name="bed"
               required
             />
             <NumberInput
               title="bath"
-              value={formData.bath}
+              value={bath}
               onChange={changeHandler}
               name="bath"
               required
@@ -103,12 +207,36 @@ const CreateListing = () => {
           />
           <TextareaForm
             title="address"
-            value={formData.address}
+            value={address}
             onChange={changeHandler}
           />
+          <div className="location form-item">
+            <p className="latitude">
+              <span>Latitude</span>
+              <input
+                type="number"
+                value={latitude}
+                name="latitude"
+                id="latitude"
+                onChange={changeHandler}
+                required
+              />
+            </p>
+            <p className="longitude">
+              <span>Longitude</span>
+              <input
+                type="number"
+                value={longitude}
+                name="longitude"
+                id="longitude"
+                onChange={changeHandler}
+                required
+              />
+            </p>
+          </div>
           <TextareaForm
             title="description"
-            value={formData.description}
+            value={description}
             onChange={changeHandler}
           />
           <RadioForm
@@ -120,7 +248,7 @@ const CreateListing = () => {
           />
           <NumberInput
             title="regular price"
-            value={formData.regularPrice}
+            value={regularPrice}
             onChange={changeHandler}
             name="regularPrice"
             required
@@ -132,9 +260,11 @@ const CreateListing = () => {
             </p>
             <input
               type="file"
-              name=""
-              id=""
+              onChange={changeHandler}
+              name="images"
+              id="images"
               accept=".jpg,.png,.jpeg"
+              multiple
               required
             />
           </div>

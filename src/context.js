@@ -6,14 +6,17 @@ const ListingContext = ({ children }) => {
   const [formData, setFormData] = useState({
     type: '',
     name: '',
-    bed: 0,
-    bath: 0,
+    bed: 0 * 1,
+    bath: 0 * 1,
     parking: false,
     furnished: false,
     address: '',
+    latitude: 0 * 1,
+    longitude: 0 * 1,
     description: '',
     offer: false,
-    regularPrice: 0,
+    regularPrice: 0 * 1,
+    images: {},
   });
   return (
     <ListingFormData.Provider
